@@ -16,5 +16,5 @@ typedef struct Node {
     struct Node** children;
 } Node;
 
-
+//paul est une salope
 #endif //TREE_H
