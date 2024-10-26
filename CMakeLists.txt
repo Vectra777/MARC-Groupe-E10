@@ -14,5 +14,9 @@ add_executable(untitled1 main.c
         queue.h
         stack.c
         stack.h
+<<<<<<< HEAD
         tree.h
         )
+=======
+        tree.h)
+>>>>>>> 20f18c65318e13a793f794f8fc7cf0b898c0ce93
