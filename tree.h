@@ -13,7 +13,8 @@ typedef struct Node {
     int totalCost;
     t_soil soilType;
 
-    struct Node** children;
+    struct Node* parent;
+    struct Node** childrens;
 } Node;
 
 

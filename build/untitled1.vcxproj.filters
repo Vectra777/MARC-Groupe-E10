@@ -36,6 +36,9 @@
     <ClInclude Include="C:\Users\crafi\MARC\stack.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="C:\Users\crafi\MARC\tree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="C:\Users\crafi\MARC\CMakeLists.txt" />
