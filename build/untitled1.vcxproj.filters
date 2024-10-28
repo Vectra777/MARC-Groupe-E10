@@ -19,6 +19,9 @@
     <ClCompile Include="C:\Users\crafi\MARC\stack.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="C:\Users\crafi\MARC\tree.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C:\Users\crafi\MARC\loc.h">

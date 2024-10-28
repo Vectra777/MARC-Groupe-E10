@@ -317,6 +317,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="C:\Users\crafi\MARC\stack.c" />
     <ClInclude Include="C:\Users\crafi\MARC\stack.h" />
     <ClInclude Include="C:\Users\crafi\MARC\tree.h" />
+    <ClCompile Include="C:\Users\crafi\MARC\tree.c" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="C:\Users\crafi\MARC\build\ZERO_CHECK.vcxproj">
