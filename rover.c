@@ -7,11 +7,11 @@ Rover createRover(t_localisation pos, int totalCost, Tree tree)
     Rover rover;
     rover.pos = pos;
     rover.totalCost = totalCost;
-int moves[] = {F_10, F_20, F_30, B_10, T_LEFT, T_RIGHT, U_TURN};
-memcpy(rover.moves, moves, sizeof(moves));
-rover.tree = tree;
-int remainingMoves[] = {22, 15, 7, 7, 21, 21, 7};
-memcpy(rover.remainingMoves, remainingMoves, sizeof(remainingMoves));
+    int moves[] = {F_10, F_20, F_30, B_10, T_LEFT, T_RIGHT, U_TURN,F_30,F_30};
+    memcpy(rover.moves, moves, sizeof(moves));
+    rover.tree = tree;
+    int remainingMoves[] = {22, 15, 7, 7, 21, 21, 7};
+    memcpy(rover.remainingMoves, remainingMoves, sizeof(remainingMoves));
 
 
     return rover;

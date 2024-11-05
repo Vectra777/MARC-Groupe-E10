@@ -3,6 +3,7 @@
 #include "map.h"
 #include "tree.h"
 #include <stdbool.h>
+#include "rover.h"
 
 
  int main() {
@@ -30,7 +31,13 @@
 /*salut*/
    
     t_map map = createMapFromFile("..\\maps\\example1.map");
-
+    // create a test for a rover with a tree
+    Tree tree = createEmptyTree();
+    t_rover rover = createRover(loc_init(5, 5, NORTH), 0,tree);
+    createTree(map, tree, rover);
+    displayRover(rover);
+    displayTree(tree.root);
+    
     return 0;
 }
 
