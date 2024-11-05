@@ -14,18 +14,18 @@ typedef struct Node {
 } Node;
 
 
-typedef struct s_tree {
+typedef struct s_Tree {
     Node* root;
 } Tree;
 
 
 
 Tree createEmptyTree();
-Node* createNode(int x, int y, int cost, t_soil soilType);
+Node* createNode(int cost, t_soil soilType);
 void addChild(Node* parent, Node* child);
 void displayTree(Node* node);
 void createTree(t_map map, Tree tree, t_rover rover);
-void createTreeRec(t_map map, Node* node, t_rover rover, int maxDepth);
+void createTreeRec(t_map map, Node* node, t_rover rover, int maxDepth, int availablemoves);
 void freeTree(Node* node);
 
 #endif //TREE_H

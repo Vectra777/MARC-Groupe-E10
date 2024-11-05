@@ -33,7 +33,7 @@
     t_map map = createMapFromFile("..\\maps\\example1.map");
     // create a test for a rover with a tree
     Tree tree = createEmptyTree();
-    t_rover rover = createRover(loc_init(5, 5, NORTH), 0,tree);
+    t_rover rover = createRover(loc_init(5, 5, NORTH), 0, tree.root);
     createTree(map, tree, rover);
     displayRover(rover);
     displayTree(tree.root);

@@ -3,11 +3,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-Tree createTree() {
-    Tree tree;
-    tree.root = NULL;
-    return tree;
-}
 
 Node* createNode(int cost, t_soil soilType) {
     Node* node = (Node*)malloc(sizeof(Node));
@@ -28,7 +23,7 @@ void addChild(Node* parent, Node* child) {
 }
 
 void displayTree(Node* node) {
-    printf("(%d, %d) %d, Children: %d\n", node->cost, node->numChildren);
+    printf("%d, Children: %d\n", node->cost, node->numChildren);
     for (int i = 0; i < node->numChildren; i++) {
         displayTree(node->children[i]);
     }

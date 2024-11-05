@@ -17,8 +17,8 @@ typedef struct s_rover
     int remainingMoves[7];
 } t_rover;
 
-t_rover createRover(t_localisation, int totalCost, Tree);
-void displayRover(Rover);
-void freeRover(Rover);
+t_rover createRover(t_localisation loc, int totalCost, Tree tree);
+void displayRover(t_rover);
+void freeRover(t_rover);
 
 #endif //ROVER_H

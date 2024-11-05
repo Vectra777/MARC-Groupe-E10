@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-Rover createRover(t_localisation pos, int totalCost, Tree tree)
+t_rover createRover(t_localisation pos, int totalCost, Tree tree)
 {
-    Rover rover;
+    t_rover rover;
     rover.pos = pos;
     rover.totalCost = totalCost;
     int moves[] = {F_10, F_20, F_30, B_10, T_LEFT, T_RIGHT, U_TURN,F_30,F_30};
@@ -17,13 +17,13 @@ Rover createRover(t_localisation pos, int totalCost, Tree tree)
     return rover;
 }
 
-void displayRover(Rover rover)
+void displayRover(t_rover rover)
 {
     printf("Rover position: (%d, %d) %d\n", rover.pos.pos.x, rover.pos.pos.y, rover.totalCost);
     displayTree(rover.tree.root);
 }
 
-void freeRover(Rover rover)
+void freeRover(t_rover rover)
 {
     freeTree(rover.tree.root);
 }
