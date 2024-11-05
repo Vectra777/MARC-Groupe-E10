@@ -27,7 +27,7 @@
     }
     displayMap(map);
     */
-
+/*salut*/
    
     t_map map = createMapFromFile("..\\maps\\example1.map");
 
