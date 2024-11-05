@@ -1,4 +1,5 @@
 #include "tree.h"
+#include "rover.h"
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -8,10 +9,8 @@ Tree createTree() {
     return tree;
 }
 
-Node* createNode(int x, int y, int cost, t_soil soilType) {
+Node* createNode(int cost, t_soil soilType) {
     Node* node = (Node*)malloc(sizeof(Node));
-    node->x = x;
-    node->y = y;
     node->cost = cost;
     node->soilType = soilType;
     node->parent = NULL;
@@ -28,12 +27,8 @@ void addChild(Node* parent, Node* child) {
     child->parent = parent;
 }
 
-
 void displayTree(Node* node) {
-    if (node == NULL) {
-        return;
-    }
-    printf("Node (%d, %d) with cost %d and soil type %d\n", node->x, node->y, node->cost, node->soilType);
+    printf("(%d, %d) %d, Children: %d\n", node->cost, node->numChildren);
     for (int i = 0; i < node->numChildren; i++) {
         displayTree(node->children[i]);
     }
@@ -50,50 +45,53 @@ void freeTree(Node* node) {
     free(node);
 }
 
-void MapToTreeRec(t_map map, Node* node, int** visited) {
-    int x = node->x;
-    int y = node->y;
+void createTree(t_map map, Tree tree, Rover rover) {
+    Node* root = createNode(map.costs[rover.pos.pos.x][rover.pos.pos.y], map.soils[rover.pos.pos.x][rover.pos.pos.y]);
+    tree.root = root;
+    createTreeRec(map, root, rover, 5);
+}
 
-    visited[y][x] = 1;
-
-    int dx[] = {0, 0, -1, 1};
-    int dy[] = {-1, 1, 0, 0};
-
-    for (int dir = 0; dir < 4; dir++) {
-        int newX = x + dx[dir];
-        int newY = y + dy[dir];
-
-        if (newX >= 0 && newX < map.x_max && newY >= 0 && newY < map.y_max) {
-
-            if (!visited[newY][newX]) {
-
-                Node* child = createNode(newX, newY, map.costs[newY][newX], map.soils[newY][newX]);
-                addChild(node, child);
-                MapToTreeRec(map, child, visited);
-            }
+void createTreeRec(t_map map, Node* node, Rover rover, int maxDepth) {
+    if (maxDepth == 0) {
+        return;
+    }
+    for (int i = 0; i < 9; i++) {
+        t_localisation newPos = rover.pos;
+        switch (rover.moves[i]) {
+            case F_10:
+                newPos = move(newPos,rover.moves[i]);
+                break;
+            case F_20:
+                newPos = move(newPos,rover.moves[i]);
+                break;
+            case F_30:
+                newPos = move(newPos,rover.moves[i]);
+                break;
+            case B_10:
+                newPos = move(newPos,rover.moves[i]);
+                break;
+            case T_LEFT:
+                newPos = move(newPos,rover.moves[i]);
+                break;
+            case T_RIGHT:
+                newPos = move(newPos,rover.moves[i]);
+                break;
+            case U_TURN:
+                newPos = move(newPos,rover.moves[i]);
+                break;
+            default:
+                break;
+        }
+        if (isValidLocalisation(newPos.pos, map.x_max, map.y_max) && (newPos.pos.x != rover.pos.pos.x || newPos.pos.y != rover.pos.pos.y || newPos.ori != rover.pos.ori)) {
+            Node* child = createNode(map.costs[newPos.pos.x][newPos.pos.y], map.soils[newPos.pos.x][newPos.pos.y]);
+            addChild(node, child);
+            rover.remainingMoves[i]--;
+            rover.moves[i] = NULL;
+            createTreeRec(map, child, rover, maxDepth - 1);
+            rover.remainingMoves[i]++;
         }
     }
 }
 
 
-void MapToTree(t_map map, Tree* tree) {
-    int x = rand() % map.x_max;
-    int y = rand() % map.y_max;
-
-    Node* root = createNode(x, y, map.costs[y][x], map.soils[y][x]);
-    tree->root = root;
-
-    // Initialize visited array
-    int** visited = (int**)malloc(map.y_max * sizeof(int*));
-    for (int i = 0; i < map.y_max; i++) {
-        visited[i] = (int*)calloc(map.x_max, sizeof(int));
-    }
-
-    MapToTreeRec(map, root, visited);
-
-    for (int i = 0; i < map.y_max; i++) {
-        free(visited[i]);
-    }
-    free(visited);
-}
 
