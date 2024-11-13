@@ -16,4 +16,5 @@ add_executable(untitled1 main.c
         stack.h
         tree.h
         tree.c
-        )
+        rover.c
+)
