@@ -22,5 +22,6 @@ void displayRover(t_rover);
 void freeRover(t_rover);
 void createTree(t_map map, Tree *tree, t_rover rover);
 void createTreeRec(t_map map, Node* node, t_rover rover, int maxDepth, int availablemoves);
+void createTreeIterative(t_map map, Node* root, t_rover rover, int maxDepth, int availableMoves);
 
 #endif //ROVER_H

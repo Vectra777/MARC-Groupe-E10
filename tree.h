@@ -9,7 +9,7 @@ typedef struct Node {
 
 
     struct Node* parent;
-    struct Node** children;
+    struct Node* children[9];
     int numChildren;
 } Node;
 

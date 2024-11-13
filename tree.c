@@ -9,18 +9,23 @@ Node* createNode(int cost, t_soil soilType) {
     node->cost = cost;
     node->soilType = soilType;
     node->parent = NULL;
-    node->children = NULL;
     node->numChildren = 0;
     return node;
 }
 
 
 void addChild(Node* parent, Node* child) {
+    // Increment the number of children
     parent->numChildren++;
-    parent->children = (Node**)realloc(parent->children, parent->numChildren * sizeof(Node*));
+
+
+    // Check if reallocation was successful
     parent->children[parent->numChildren - 1] = child;
+
+    // Set the child's parent pointer
     child->parent = parent;
 }
+
 
 void displayTree(Node* node) {
     printf("%d, Children: %d\n", node->cost, node->numChildren);

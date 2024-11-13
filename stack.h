@@ -5,15 +5,25 @@
 #ifndef UNTITLED1_STACK_H
 #define UNTITLED1_STACK_H
 
+#include "tree.h"
+
 /**
  * @brief Structure for the stack of integers
  */
+
+
 typedef struct s_stack
 {
     int *values;
     int size;
     int nbElts;
 } t_stack;
+
+typedef struct {
+    Node* node;
+    int depth;
+    int availableMoves;
+} StackEntry;
 
 /**
  * @brief Function to create a stack
