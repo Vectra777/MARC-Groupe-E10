@@ -10,7 +10,7 @@ t_rover createRover(t_localisation pos, int totalCost, Tree *tree)
     rover.totalCost = totalCost;
     int moves[] = {F_10, F_20, F_30, B_10, T_LEFT, T_RIGHT, U_TURN,F_30,F_30};
     memcpy(rover.moves, moves, sizeof(moves));
-    rover.tree = *tree;
+    rover.tree = tree;
     int remainingMoves[] = {22, 15, 7, 7, 21, 21, 7};
     memcpy(rover.remainingMoves, remainingMoves, sizeof(remainingMoves));
 
@@ -21,12 +21,12 @@ t_rover createRover(t_localisation pos, int totalCost, Tree *tree)
 void displayRover(t_rover rover)
 {
     printf("Rover position: (%d, %d) %d\n", rover.pos.pos.x, rover.pos.pos.y, rover.totalCost);
-    displayTree(rover.tree.root);
+    displayTree(rover.tree->root);
 }
 
 void freeRover(t_rover rover)
 {
-    freeTree(rover.tree.root);
+    freeTree(rover.tree->root);
 }
 void createTree(t_map map, Tree *tree, t_rover rover) {
     Node* root = createNode(map.costs[rover.pos.pos.x][rover.pos.pos.y], map.soils[rover.pos.pos.x][rover.pos.pos.y]);

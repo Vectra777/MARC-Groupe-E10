@@ -13,7 +13,7 @@ typedef struct s_rover
     int totalCost;
     //array of moves
     t_move moves[9];
-    Tree tree;
+    Tree *tree;
     int remainingMoves[7];
 } t_rover;
 
