@@ -39,38 +39,15 @@ void createTreeRec(t_map map, Node* node, t_rover rover, int maxDepth, int avail
     if (maxDepth == 0) {
         return;
     }
+    t_localisation initPos = rover.pos;
     for (int i = 0; i < availablemoves; i++) {
-        t_localisation newPos = rover.pos;
-        switch (rover.moves[i]) {
-            case F_10:
-                newPos = move(newPos,rover.moves[i]);
-                break;
-            case F_20:
-                newPos = move(newPos,rover.moves[i]);
-                break;
-            case F_30:
-                newPos = move(newPos,rover.moves[i]);
-                break;
-            case B_10:
-                newPos = move(newPos,rover.moves[i]);
-                break;
-            case T_LEFT:
-                newPos = move(newPos,rover.moves[i]);
-                break;
-            case T_RIGHT:
-                newPos = move(newPos,rover.moves[i]);
-                break;
-            case U_TURN:
-                newPos = move(newPos,rover.moves[i]);
-                break;
-            default:
-                break;
-        }
-        if (isValidLocalisation(newPos.pos, map.x_max, map.y_max)) {
+        t_localisation newPos = initPos;
+        newPos = move(newPos,rover.moves[i]);
             Node* child = createNode(map.costs[newPos.pos.x][newPos.pos.y], map.soils[newPos.pos.x][newPos.pos.y]);
             addChild(node, child);
-            createTreeIterative(map, child, rover, maxDepth - 1, availablemoves-1);
-        }
+            rover.pos = newPos;
+            createTreeRec(map, child, rover, maxDepth - 1, availablemoves-1);
+
     }
 }
 
