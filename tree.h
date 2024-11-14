@@ -2,12 +2,12 @@
 #define TREE_H
 
 #include "map.h"
+#include "moves.h"
 
 typedef struct Node {
     int cost;
     t_soil soilType;
-
-
+    t_move move;
     struct Node* parent;
     struct Node* children[9];
     int numChildren;
@@ -21,7 +21,7 @@ typedef struct s_Tree {
 
 
 Tree createEmptyTree();
-Node* createNode(int cost, t_soil soilType);
+Node* createNode(int cost, t_soil soilType, t_move move);
 void addChild(Node* parent, Node* child);
 void displayTree(Node* node);
 void freeTree(Node* node);

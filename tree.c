@@ -4,12 +4,13 @@
 #include <stdio.h>
 
 
-Node* createNode(int cost, t_soil soilType) {
+Node* createNode(int cost, t_soil soilType, t_move move) {
     Node* node = (Node*)malloc(sizeof(Node));
     node->cost = cost;
     node->soilType = soilType;
     node->parent = NULL;
     node->numChildren = 0;
+    node->move = move;
     return node;
 }
 

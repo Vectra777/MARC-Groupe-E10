@@ -29,13 +29,25 @@ void freeRover(t_rover rover)
 {
     freeTree(rover.tree->root);
 }
-void createTree(t_map map, Tree *tree, t_rover rover) {
-    Node* root = createNode(map.costs[rover.pos.pos.x][rover.pos.pos.y], map.soils[rover.pos.pos.x][rover.pos.pos.y]);
+void createTree(t_map *map, Tree *tree, t_rover rover) {
+    Node* root = createNode(map->costs[rover.pos.pos.x][rover.pos.pos.y], map->soils[rover.pos.pos.x][rover.pos.pos.y], 0);
     tree->root = root;
     createTreeRec(map, root, rover, 5, 9);
 }
 
-void createTreeRec(t_map map, Node* node, t_rover rover, int maxDepth, int availablemoves) {
+void removeMove(t_rover *rover, int move) {
+    int newMoves[9];
+    int index = 0;
+    for (int i = 0; i < 9; i++) {
+        if (i != move) {
+            newMoves[index] = rover->moves[i];
+            index++;
+        }
+    }
+    memcpy(rover->moves, newMoves, sizeof(newMoves));
+}
+
+void createTreeRec(t_map *map, Node* node, t_rover rover, int maxDepth, int availablemoves) {
     if (maxDepth == 0) {
         return;
     }
@@ -43,13 +55,16 @@ void createTreeRec(t_map map, Node* node, t_rover rover, int maxDepth, int avail
     for (int i = 0; i < availablemoves; i++) {
         t_localisation newPos = initPos;
         newPos = move(newPos,rover.moves[i]);
-            Node* child = createNode(map.costs[newPos.pos.x][newPos.pos.y], map.soils[newPos.pos.x][newPos.pos.y]);
-            addChild(node, child);
-            rover.pos = newPos;
-            createTreeRec(map, child, rover, maxDepth - 1, availablemoves-1);
+
+        Node* child = createNode(map->costs[newPos.pos.x][newPos.pos.y], map->soils[newPos.pos.x][newPos.pos.y], rover.moves[i]);
+        addChild(node, child);
+        t_rover newRover = createRover(newPos, 0, rover.tree);
+        removeMove(&newRover, i);
+        createTreeRec(map, child, newRover, maxDepth - 1, availablemoves-1);
 
     }
 }
+
 
 void createTreeIterative(t_map map, Node* root, t_rover rover, int maxDepth, int availableMoves) {
     // Create a stack
@@ -81,7 +96,7 @@ void createTreeIterative(t_map map, Node* root, t_rover rover, int maxDepth, int
             // Check if the new position is valid
             if (isValidLocalisation(newPos.pos, map.x_max, map.y_max)) {
                 // Create a new child node
-                Node* child = createNode(map.costs[newPos.pos.x][newPos.pos.y], map.soils[newPos.pos.x][newPos.pos.y]);
+                Node* child = createNode(map.costs[newPos.pos.x][newPos.pos.y], map.soils[newPos.pos.x][newPos.pos.y], rover.moves[i]);
                 addChild(currentNode, child);
 
                 // Push the child node onto the stack with updated depth and moves

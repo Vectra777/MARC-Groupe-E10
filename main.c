@@ -34,7 +34,15 @@
     // create a test for a rover with a tree
     Tree tree = createEmptyTree();
     t_rover rover = createRover(loc_init(5, 5, NORTH), 0, &tree);
-    createTree(map, &tree, rover);
+    createTree(&map, &tree, rover);
+    for (int i = 0; i < map.y_max; i++)
+     {
+         for (int j = 0; j < map.x_max; j++)
+         {
+             printf("%-5d ", map.costs[i][j]);
+         }
+         printf("\n");
+     }
 
 
     
