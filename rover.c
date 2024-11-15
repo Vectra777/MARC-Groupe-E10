@@ -56,12 +56,18 @@ void createTreeRec(t_map *map, Node* node, t_rover rover, int maxDepth, int avai
         t_localisation newPos = initPos;
         newPos = move(newPos,rover.moves[i]);
 
-        Node* child = createNode(map->costs[newPos.pos.x][newPos.pos.y], map->soils[newPos.pos.x][newPos.pos.y], rover.moves[i]);
-        addChild(node, child);
-        t_rover newRover = createRover(newPos, 0, rover.tree);
-        removeMove(&newRover, i);
-        createTreeRec(map, child, newRover, maxDepth - 1, availablemoves-1);
+        if (isValidLocalisation(newPos.pos, map->x_max, map->y_max)) {
 
+            Node *child = createNode(map->costs[newPos.pos.x][newPos.pos.y], map->soils[newPos.pos.x][newPos.pos.y],
+                                     rover.moves[i]);
+            addChild(node, child);
+            rover.pos = newPos;
+            createTreeRec(map, child, rover, maxDepth - 1, availablemoves - 1);
+        }else{
+            Node *child = createNode(11001, CREVASSE,
+                                     rover.moves[i]);
+            addChild(node, child);
+        }
     }
 }
 
