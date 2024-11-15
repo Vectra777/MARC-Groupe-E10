@@ -62,6 +62,7 @@ void createTreeRec(t_map *map, Node* node, t_rover rover, int maxDepth, int avai
                                      rover.moves[i]);
             addChild(node, child);
             rover.pos = newPos;
+            removeMove(&rover, i);
             createTreeRec(map, child, rover, maxDepth - 1, availablemoves - 1);
         }else{
             Node *child = createNode(11001, CREVASSE,
