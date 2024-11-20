@@ -27,5 +27,6 @@ Node* findLowestCostLeaf(Node* node);
 int* retracePath(Node* node);
 void applyPath(t_map map, t_rover rover, t_move* path, int pathLength);
 void displayMapWithRover(t_map map, t_position roverPos);
+void guidance(t_rover rover, int* path);
 
 #endif //ROVER_H

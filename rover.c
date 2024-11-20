@@ -288,3 +288,16 @@ void applyPath(t_map map, t_rover rover, t_move* path, int pathLength) {
     printf("Final position reached.\n");
 }
 
+void guidance(t_rover rover, int* path) {
+    int pathLength = path[-1];
+    for (int i = 0; i < pathLength; i++) {
+        t_move move1 = path[i];
+        t_localisation newPos = move(rover.pos, move1);
+        rover.pos = newPos;
+
+        printf("Rover position: (%d, %d)\n", rover.pos.pos.x, rover.pos.pos.y);
+
+    }
+    printf("Final position reached.\n");
+}
+
