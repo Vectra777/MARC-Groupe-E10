@@ -163,25 +163,63 @@ Node* findLowestCostLeaf(Node* node) {
     return minCostNode;
 }
 
-void retracePath(Node* node) {
+int* retracePath(Node* node) {
     if (node == NULL) {
         printf("The node is NULL. No path to retrace.\n");
-        return;
+        return NULL;
     }
 
-    int totalCost = 0;
     Node* current = node;
 
-    // Array to store the path (assuming a reasonable max path length for simplicity)
-    int path[100]; // Adjust the size as necessary
-    int pathIndex = 0;
+    // Count the number of steps in the path
+    int count = 0;
+    int totalCost = 0;
+    while (current->parent != NULL) {
+        count++;
+        current = current->parent;
+    }
 
+    // Allocate memory for the path (+1 to store the path length)
+    int* path = (int*)malloc((count + 1) * sizeof(int));
+    if (path == NULL) {
+        printf("Memory allocation failed.\n");
+        return NULL;
+    }
+
+    // Populate the path array and calculate the total cost
+    current = node; // Reset current to the input node
+    int index = 0;
+    while (current->parent != NULL) {
+        totalCost += current->cost;         // Add the cost of the current node
+        path[index++] = current->move;     // Store the move
+        current = current->parent;         // Move to the parent node
+    }
+
+    // Reverse the path to make it from root to node
+    for (int i = 0; i < index / 2; i++) {
+        int temp = path[i];
+        path[i] = path[index - i - 1];
+        path[index - i - 1] = temp;
+    }
+
+    //print path
+    for (int i = 0; i < index; i++) {
+        printf("%d ", path[i]);
+    }
+
+    int pathIndex = 0;
     // Retrace the path from the given node to the root
     while (current->parent != NULL) {
         totalCost += current->cost;          // Add the cost of the current node
         path[pathIndex++] = current->move;  // Store the move taken to reach this node
         current = current->parent;          // Move to the parent node
     }
+    for (int i = 0; i < index / 2; i++) {
+        int temp = path[i];
+        path[i] = path[index - i - 1];
+        path[index - i - 1] = temp;
+    }
+    path[pathIndex] = pathIndex;
 
     // Print the total cost
     printf("Total cost of the path: %d\n", totalCost);
@@ -194,5 +232,73 @@ void retracePath(Node* node) {
         }
     }
     printf("\n");
+    return path;
+}
+
+void displayMapWithRover(t_map map, t_position roverPos) {
+    for (int i = 0; i < map.y_max; i++) {
+        for (int rep = 0; rep < 3; rep++) {
+            for (int j = 0; j < map.x_max; j++) {
+                char c[4];
+                if (i == roverPos.y && j == roverPos.x) {
+                    // Mark the rover's position with " x "
+                    strcpy(c, " x ");
+                } else {
+                    switch (map.soils[i][j]) {
+                        case BASE_STATION:
+                            if (rep == 1) {
+                                strcpy(c, " B ");
+                            } else {
+                                strcpy(c, "   ");
+                            }
+                            break;
+                        case PLAIN:
+                            strcpy(c, "---");
+                            break;
+                        case ERG:
+                            strcpy(c, "~~~");
+                            break;
+                        case REG:
+                            strcpy(c, "^^^");
+                            break;
+                        case CREVASSE:
+                            sprintf(c, "%c%c%c", 219, 219, 219);
+                            break;
+                        default:
+                            strcpy(c, "???");
+                            break;
+                    }
+                }
+                printf("%s", c);
+            }
+            printf("\n");
+        }
+    }
+}
+
+// Function to apply the path visually
+void applyPath(t_map map, t_rover rover, t_move* path, int pathLength) {
+
+
+    printf("Initial position:\n");
+    displayMapWithRover(map, rover.pos.pos);
+    printf("\n");
+
+    for (int i = 0; i < pathLength; i++) {
+        t_localisation newPos = move(rover.pos, path[i]);
+        if (isValidLocalisation(newPos.pos, map.x_max, map.y_max)) {
+            rover.pos = newPos;
+            printf("Move %d: %s\n", i + 1, getMoveAsString(path[i]));
+            displayMapWithRover(map, rover.pos.pos);
+            printf("\n");
+        } else {
+            printf("Invalid move %d: %s\n", i + 1, getMoveAsString(path[i]));
+            break;
+        }
+    }
+
+
+
+    printf("Final position reached.\n");
 }
 

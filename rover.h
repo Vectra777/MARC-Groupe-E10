@@ -24,6 +24,8 @@ void removeMove(t_rover* , int move);
 void createTree(t_map *map, Tree *tree, t_rover rover);
 void createTreeRec(t_map *map, Node* node, t_rover rover, int maxDepth, int availablemoves);
 Node* findLowestCostLeaf(Node* node);
-void retracePath(Node* node);
+int* retracePath(Node* node);
+void applyPath(t_map map, t_rover rover, t_move* path, int pathLength);
+void displayMapWithRover(t_map map, t_position roverPos);
 
 #endif //ROVER_H

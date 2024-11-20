@@ -38,12 +38,14 @@ void displayTree(Node* node) {
 void freeTree(Node* node) {
     if (node == NULL) {
         return;
+    }else if (node->numChildren == 0) {
+        for (int i = 0; i < node->numChildren; i++) {
+            freeTree(node->children[i]);
+        }
+        free(node);
+    }else{
+        free(node);
     }
-    for (int i = 0; i < node->numChildren; i++) {
-        freeTree(node->children[i]);
-    }
-    free(node->children);
-    free(node);
 }
 
 Tree createEmptyTree() {
