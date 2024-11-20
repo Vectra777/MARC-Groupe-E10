@@ -35,6 +35,8 @@
     Tree tree = createEmptyTree();
     t_rover rover = createRover(loc_init(5, 5, NORTH), 0, &tree);
     createTree(&map, &tree, rover);
+    Node* lowestcost= findLowestCostLeaf(tree.root);
+    retracePath(lowestcost);
     for (int i = 0; i < map.y_max; i++)
      {
          for (int j = 0; j < map.x_max; j++)

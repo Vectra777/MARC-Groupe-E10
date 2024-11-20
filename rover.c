@@ -47,6 +47,22 @@ void removeMove(t_rover *rover, int move) {
     memcpy(rover->moves, newMoves, sizeof(newMoves));
 }
 
+void removeMoveByIndex(t_rover *rover, int totalMoves, int indexToRemove) {
+    if (indexToRemove < 0 || indexToRemove >= totalMoves) {
+        // Invalid index, do nothing
+        fprintf(stderr, "Invalid index: %d\n", indexToRemove);
+        return;
+    }
+
+    // Shift the remaining moves to fill the gap
+    for (int i = indexToRemove; i < totalMoves - 1; i++) {
+        rover->moves[i] = rover->moves[i + 1];
+    }
+
+    // Optionally, clear the last move (not strictly necessary, depends on your use case)
+    rover->moves[totalMoves - 1] = 20;
+}
+
 void createTreeRec(t_map *map, Node* node, t_rover rover, int maxDepth, int availablemoves) {
     if (maxDepth == 0 || availablemoves <= 0) {
         return;
@@ -64,48 +80,56 @@ void createTreeRec(t_map *map, Node* node, t_rover rover, int maxDepth, int avai
                                          rover.moves[i]);
                 addChild(node, child);
 
-            }else if (map->soils[newPos.pos.x][newPos.pos.y] == ERG){
-
-                Node *child = createNode(map->costs[newPos.pos.x][newPos.pos.y], map->soils[newPos.pos.x][newPos.pos.y],
-                                         rover.moves[i]);
+            }else if(map->soils[newPos.pos.x][newPos.pos.y] == ERG){
+                t_soil soilType = map->soils[newPos.pos.x][newPos.pos.y];
+                Node *child = createNode(map->costs[newPos.pos.x][newPos.pos.y], soilType, rover.moves[i]);
                 addChild(node, child);
                 rover.pos = newPos;
-                removeMove(&rover, i);
-                t_rover rover2 = createRover(rover.pos, rover.totalCost, rover.tree);
-                memcpy(rover2.moves, rover.moves, sizeof(rover.moves));
-                int availablemoves2 = 0;
-                for (int j = 0; j < availablemoves; j++) {
-                    switch (rover2.moves[j]) {
+
+                t_move tmpmoves[9];
+                memcpy(tmpmoves, rover.moves, sizeof(rover.moves));
+
+                // Reduce the effectiveness of movements based on rules
+                int removedMovesCount = 0;
+                for (int j = 0; j < 9; j++) {
+                    switch (rover.moves[j]) {
                         case F_10:
                         case B_10:
-                        case T_LEFT:
-                        case T_RIGHT:
-                            // Remove the move entirely
-                            removeMove(&rover2, j);
-                            j--; // Adjust index after removing
-                            availablemoves2++;
+                            rover.moves[j] = 0; // Disable this move
+                            removedMovesCount++;
                             break;
                         case F_20:
-                            rover2.moves[j] = F_10; // Reduce advancing power
+                            rover.moves[j] = F_10; // Reduce advancing power
                             break;
                         case F_30:
-                            rover2.moves[j] = F_20; // Reduce advancing power
+                            rover.moves[j] = F_20; // Reduce advancing power
+                            break;
+                        case T_LEFT:
+                        case T_RIGHT:
+                            rover.moves[j] = 0; // Disable turning
+                            removedMovesCount++;
                             break;
                         case U_TURN:
-                            rover2.moves[j] = T_LEFT; // Change to simpler move
+                            rover.moves[j] = T_LEFT; // Simplify the U-turn
                             break;
                         default:
                             break;
                     }
                 }
-                createTreeRec(map, child, rover2, maxDepth - 1, availablemoves - availablemoves2 + 1);
+
+                int newAvailableMoves = availablemoves - removedMovesCount;
+                createTreeRec(map, child, rover, maxDepth - 1, newAvailableMoves);
+                memcpy(rover.moves, tmpmoves, sizeof(tmpmoves));
             }else {
                 Node *child = createNode(map->costs[newPos.pos.x][newPos.pos.y], map->soils[newPos.pos.x][newPos.pos.y],
                                          rover.moves[i]);
                 addChild(node, child);
                 rover.pos = newPos;
-                removeMove(&rover, i);
+                t_move tmpmoves[9];
+                memcpy(tmpmoves, rover.moves, sizeof(rover.moves));
+                removeMoveByIndex(&rover, availablemoves, i);
                 createTreeRec(map, child, rover, maxDepth - 1, availablemoves - 1);
+                memcpy(rover.moves, tmpmoves, sizeof(tmpmoves));
 
             }
 
@@ -118,45 +142,57 @@ void createTreeRec(t_map *map, Node* node, t_rover rover, int maxDepth, int avai
 }
 
 
-void createTreeIterative(t_map map, Node* root, t_rover rover, int maxDepth, int availableMoves) {
-    // Create a stack
-    StackEntry* stack = (StackEntry*)malloc(sizeof(StackEntry) * 100); // Adjust size as needed
-    int stackSize = 0;
 
-    // Push the root node onto the stack
-    stack[stackSize++] = (StackEntry){root, maxDepth, availableMoves};
+Node* findLowestCostLeaf(Node* node) {
 
-    // Process the stack iteratively
-    while (stackSize > 0) {
-        // Pop a node from the stack
-        StackEntry currentEntry = stack[--stackSize];
-        Node* currentNode = currentEntry.node;
-        int currentDepth = currentEntry.depth;
-        int currentMoves = currentEntry.availableMoves;
+    if (node->numChildren == 0) {
+        return node; // Return the cost of the leaf
+    }
 
-        // If we've reached the maximum depth, continue
-        if (currentDepth == 0) {
-            continue;
-        }
-
-        // Try each move for the current node
-        for (int i = 0; i < currentMoves; i++) {
-            t_localisation newPos = rover.pos;
-            newPos = move(newPos, rover.moves[i]);
-
-
-            // Check if the new position is valid
-            if (isValidLocalisation(newPos.pos, map.x_max, map.y_max)) {
-                // Create a new child node
-                Node* child = createNode(map.costs[newPos.pos.x][newPos.pos.y], map.soils[newPos.pos.x][newPos.pos.y], rover.moves[i]);
-                addChild(currentNode, child);
-
-                // Push the child node onto the stack with updated depth and moves
-                stack[stackSize++] = (StackEntry){child, currentDepth - 1, currentMoves - 1};
-            }
+    // Recursively find the lowest cost in the child nodes
+    int minCost = 99999;
+    Node* minCostNode;
+    for (int i = 0; i < node->numChildren; i++) {
+        Node* childCost = findLowestCostLeaf(node->children[i]);
+        if (childCost->cost < minCost && childCost->cost >= 0) {
+            minCost = childCost->cost;
+            minCostNode = childCost;
         }
     }
 
-    // Free the stack memory
-    free(stack);
+    return minCostNode;
 }
+
+void retracePath(Node* node) {
+    if (node == NULL) {
+        printf("The node is NULL. No path to retrace.\n");
+        return;
+    }
+
+    int totalCost = 0;
+    Node* current = node;
+
+    // Array to store the path (assuming a reasonable max path length for simplicity)
+    int path[100]; // Adjust the size as necessary
+    int pathIndex = 0;
+
+    // Retrace the path from the given node to the root
+    while (current->parent != NULL) {
+        totalCost += current->cost;          // Add the cost of the current node
+        path[pathIndex++] = current->move;  // Store the move taken to reach this node
+        current = current->parent;          // Move to the parent node
+    }
+
+    // Print the total cost
+    printf("Total cost of the path: %d\n", totalCost);
+
+    // Print the path in reverse order (from root to the given node)
+    printf("Path (from root to node): ");
+    for (int i = pathIndex - 1; i >= 0; i--) {
+        if (path[i] != 0) { // Assuming 0 is a placeholder for no move
+            printf("%d ", path[i]);
+        }
+    }
+    printf("\n");
+}
+
