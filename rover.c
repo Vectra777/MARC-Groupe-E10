@@ -64,15 +64,8 @@ void createTreeRec(t_map *map, Node* node, t_rover rover, int maxDepth, int avai
                                          rover.moves[i]);
                 addChild(node, child);
 
-            }else if(map->soils[newPos.pos.x][newPos.pos.y] == REG){
-                Node *child = createNode(map->costs[newPos.pos.x][newPos.pos.y], map->soils[newPos.pos.x][newPos.pos.y],
-                                         rover.moves[i]);
-                addChild(node, child);
-                rover.pos = newPos;
-                removeMove(&rover, i);
-                createTreeRec(map, child, rover, maxDepth - 1, availablemoves - 1);
-
             }else if (map->soils[newPos.pos.x][newPos.pos.y] == ERG){
+
                 Node *child = createNode(map->costs[newPos.pos.x][newPos.pos.y], map->soils[newPos.pos.x][newPos.pos.y],
                                          rover.moves[i]);
                 addChild(node, child);
@@ -80,37 +73,29 @@ void createTreeRec(t_map *map, Node* node, t_rover rover, int maxDepth, int avai
                 removeMove(&rover, i);
                 t_rover rover2 = createRover(rover.pos, rover.totalCost, rover.tree);
                 memcpy(rover2.moves, rover.moves, sizeof(rover.moves));
-                int availablemoves2 =0;
-                for(int j = 0; j < 9; j++){
+                int availablemoves2 = 0;
+                for (int j = 0; j < availablemoves; j++) {
                     switch (rover2.moves[j]) {
                         case F_10:
+                        case B_10:
+                        case T_LEFT:
+                        case T_RIGHT:
+                            // Remove the move entirely
                             removeMove(&rover2, j);
+                            j--; // Adjust index after removing
                             availablemoves2++;
                             break;
                         case F_20:
-                            rover2.moves[j] = F_10;
+                            rover2.moves[j] = F_10; // Reduce advancing power
                             break;
                         case F_30:
-                            rover2.moves[j] = F_20;
-                            break;
-                        case B_10:
-                            removeMove(&rover2, j);
-                            availablemoves2++;
-                            break;
-                        case T_LEFT:
-                            removeMove(&rover2, j);
-                            availablemoves2++;
-                            break;
-                        case T_RIGHT:
-                            removeMove(&rover2, j);
-                            availablemoves2++;
+                            rover2.moves[j] = F_20; // Reduce advancing power
                             break;
                         case U_TURN:
-                            rover2.moves[j] = T_LEFT;
+                            rover2.moves[j] = T_LEFT; // Change to simpler move
                             break;
                         default:
                             break;
-
                     }
                 }
                 createTreeRec(map, child, rover2, maxDepth - 1, availablemoves - availablemoves2 + 1);
@@ -123,6 +108,7 @@ void createTreeRec(t_map *map, Node* node, t_rover rover, int maxDepth, int avai
                 createTreeRec(map, child, rover, maxDepth - 1, availablemoves - 1);
 
             }
+
         }else{
             Node *child = createNode(11001, CREVASSE,
                                      rover.moves[i]);
