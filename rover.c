@@ -284,20 +284,6 @@ void applyPath(t_map map, t_rover rover, t_move* path, int pathLength) {
     displayMapWithRover(map, rover.pos.pos);
     printf("\n");
 
-    for (int i = 0; i < pathLength; i++) {
-        t_localisation newPos = move(rover.pos, path[i]);
-        if (isValidLocalisation(newPos.pos, map.x_max, map.y_max)) {
-            rover.pos = newPos;
-            printf("Move %d: %s\n", i + 1, getMoveAsString(path[i]));
-            displayMapWithRover(map, rover.pos.pos);
-            printf("\n");
-        } else {
-            printf("Invalid move %d: %s\n", i + 1, getMoveAsString(path[i]));
-            break;
-        }
-    }
-
-
 
     printf("Final position reached.\n");
 }
