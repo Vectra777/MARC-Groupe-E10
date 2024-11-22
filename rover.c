@@ -180,7 +180,7 @@ int* retracePath(Node* node) {
     }
 
     // Allocate memory for the path (+1 to store the path length)
-    int* path = (int*)malloc((count + 1) * sizeof(int));
+    int* path = (int*)malloc((count) * sizeof(int));
     if (path == NULL) {
         printf("Memory allocation failed.\n");
         return NULL;
@@ -202,36 +202,21 @@ int* retracePath(Node* node) {
         path[index - i - 1] = temp;
     }
 
-    //print path
-    for (int i = 0; i < index; i++) {
-        printf("%d ", path[i]);
-    }
 
-    int pathIndex = 0;
-    // Retrace the path from the given node to the root
-    while (current->parent != NULL) {
-        totalCost += current->cost;          // Add the cost of the current node
-        path[pathIndex++] = current->move;  // Store the move taken to reach this node
-        current = current->parent;          // Move to the parent node
-    }
-    for (int i = 0; i < index / 2; i++) {
-        int temp = path[i];
-        path[i] = path[index - i - 1];
-        path[index - i - 1] = temp;
-    }
-    path[pathIndex] = pathIndex;
 
     // Print the total cost
     printf("Total cost of the path: %d\n", totalCost);
 
+
     // Print the path in reverse order (from root to the given node)
     printf("Path (from root to node): ");
-    for (int i = pathIndex - 1; i >= 0; i--) {
+    for (int i = index - 1; i >= 0; i--) {
         if (path[i] != 0) { // Assuming 0 is a placeholder for no move
             printf("%d ", path[i]);
         }
     }
     printf("\n");
+    path[index] = index;
     return path;
 }
 
@@ -289,7 +274,7 @@ void applyPath(t_map map, t_rover rover, t_move* path, int pathLength) {
 }
 
 void guidance(t_rover rover, int* path) {
-    int pathLength = path[-1];
+    int pathLength = path[5];
     for (int i = 0; i < pathLength; i++) {
         t_move move1 = path[i];
         t_localisation newPos = move(rover.pos, move1);
