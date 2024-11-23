@@ -162,24 +162,3 @@ void updateLocalisation(t_localisation *p_loc, t_move m)
     *p_loc = move(*p_loc, m);
     return;
 }
-
-t_move *getRandomMoves(int N)
-{
-    int nbmoves[]={22,15,7,7,21,21,7};
-    int total_moves=100;
-    t_move *moves = (t_move *)malloc(N * sizeof(t_move));
-    for (int i = 0; i < N; i++)
-    {
-        int r = rand() % total_moves;
-        int type=0;
-        while (r >= nbmoves[type])
-        {
-            r -= nbmoves[type];
-            type++;
-        }
-        nbmoves[type]--;
-        total_moves--;
-        moves[i] = (t_move )type;
-    }
-    return moves;
-}

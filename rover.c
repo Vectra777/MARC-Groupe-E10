@@ -3,17 +3,15 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-
+#include <time.h>
 t_rover createRover(t_localisation pos, int totalCost, Tree *tree)
 {
     t_rover rover;
     rover.pos = pos;
     rover.totalCost = totalCost;
-    int moves[] = {F_10, F_20, F_30, B_10, T_LEFT, T_RIGHT, U_TURN,F_30,F_30};
-    memcpy(rover.moves, moves, sizeof(moves));
+
+    getmouves(rover.moves);
     rover.tree = tree;
-    int remainingMoves[] = {22, 15, 7, 7, 21, 21, 7};
-    memcpy(rover.remainingMoves, remainingMoves, sizeof(remainingMoves));
 
 
     return rover;
@@ -180,7 +178,7 @@ int* retracePath(Node* node) {
     }
 
     // Allocate memory for the path (+1 to store the path length)
-    int* path = (int*)malloc((count) * sizeof(int));
+    int* path = (int*)malloc((count + 1) * sizeof(int));
     if (path == NULL) {
         printf("Memory allocation failed.\n");
         return NULL;
@@ -202,21 +200,36 @@ int* retracePath(Node* node) {
         path[index - i - 1] = temp;
     }
 
+    //print path
+    for (int i = 0; i < index; i++) {
+        printf("%d ", path[i]);
+    }
 
+    int pathIndex = 0;
+    // Retrace the path from the given node to the root
+    while (current->parent != NULL) {
+        totalCost += current->cost;          // Add the cost of the current node
+        path[pathIndex++] = current->move;  // Store the move taken to reach this node
+        current = current->parent;          // Move to the parent node
+    }
+    for (int i = 0; i < index / 2; i++) {
+        int temp = path[i];
+        path[i] = path[index - i - 1];
+        path[index - i - 1] = temp;
+    }
+    path[pathIndex] = pathIndex;
 
     // Print the total cost
     printf("Total cost of the path: %d\n", totalCost);
 
-
     // Print the path in reverse order (from root to the given node)
     printf("Path (from root to node): ");
-    for (int i = index - 1; i >= 0; i--) {
+    for (int i = pathIndex - 1; i >= 0; i--) {
         if (path[i] != 0) { // Assuming 0 is a placeholder for no move
             printf("%d ", path[i]);
         }
     }
     printf("\n");
-    path[index] = index;
     return path;
 }
 
@@ -274,7 +287,7 @@ void applyPath(t_map map, t_rover rover, t_move* path, int pathLength) {
 }
 
 void guidance(t_rover rover, int* path) {
-    int pathLength = path[5];
+    int pathLength = path[-1];
     for (int i = 0; i < pathLength; i++) {
         t_move move1 = path[i];
         t_localisation newPos = move(rover.pos, move1);
@@ -286,3 +299,39 @@ void guidance(t_rover rover, int* path) {
     printf("Final position reached.\n");
 }
 
+void getmouves(int tab[9]) {
+    int luck;
+    int tab_get[9] = {0}; // Initialisation du tableau
+    int in;
+    srand(time(NULL)); // Initialisation du générateur aléatoire
+    for (int i = 0; i < 9; i++) {
+        do {
+            in = 0;
+            luck = rand() % 100; // Génère un nombre entre 0 et 99
+            for (int j = 0; j < i; j++) {
+                if (tab_get[j] == luck) {
+                    in = 1; // Vérifie si la valeur est déjà utilisée
+                }
+            }
+        } while (in == 1);
+
+        tab_get[i] = luck; // Stocke la valeur unique
+
+        // Détermine la valeur correspondante dans le tableau
+        if (luck >= 0 && luck <= 21) {
+            tab[i] = 0;
+        } else if (luck > 21 && luck <= 36) {
+            tab[i] = 1;
+        } else if (luck > 36 && luck <= 43) {
+            tab[i] = 2;
+        } else if (luck > 43 && luck <= 50) {
+            tab[i] = 3;
+        } else if (luck > 50 && luck <= 71) {
+            tab[i] = 4;
+        } else if (luck > 71 && luck <= 92) {
+            tab[i] = 5;
+        } else if (luck > 92 && luck <= 99) {
+            tab[i] = 6;
+        }
+    }
+}

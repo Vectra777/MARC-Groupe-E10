@@ -14,7 +14,6 @@ typedef struct s_rover
     //array of moves
     t_move moves[9];
     Tree *tree;
-    int remainingMoves[7];
 } t_rover;
 
 t_rover createRover(t_localisation loc, int totalCost, Tree *tree);
@@ -28,5 +27,6 @@ int* retracePath(Node* node);
 void applyPath(t_map map, t_rover rover, t_move* path, int pathLength);
 void displayMapWithRover(t_map map, t_position roverPos);
 void guidance(t_rover rover, int* path);
+void getmouves(int tab[]);
 
 #endif //ROVER_H

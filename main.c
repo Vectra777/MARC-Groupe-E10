@@ -26,7 +26,7 @@
     Node* lowestcost= findLowestCostLeaf(tree.root);
     int* path = retracePath(lowestcost);
 
-    guidance(rover, path);
+    //guidance(rover, path);
 
 
 
