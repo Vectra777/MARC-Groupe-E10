@@ -21,12 +21,12 @@
 
      t_localisation init =loc_init(x, y, NORTH);
 
-    t_rover rover = createRover(init, 0, &tree);
+    t_rover rover = createRover(init, 0, &tree, 5);
     createTree(&map, &tree, rover);
     Node* lowestcost= findLowestCostLeaf(tree.root);
-    int* path = retracePath(lowestcost);
+    int* path = retracePath(lowestcost, &rover);
 
-    //guidance(rover, path);
+    guidance(rover, path, map);
 
 
 

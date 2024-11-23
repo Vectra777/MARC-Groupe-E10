@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
-t_rover createRover(t_localisation pos, int totalCost, Tree *tree)
+t_rover createRover(t_localisation pos, int totalCost, Tree *tree, int maxDepth)
 {
     t_rover rover;
     rover.pos = pos;
@@ -12,6 +12,8 @@ t_rover createRover(t_localisation pos, int totalCost, Tree *tree)
 
     getmouves(rover.moves);
     rover.tree = tree;
+
+    rover.maxDepth = maxDepth;
 
 
     return rover;
@@ -161,7 +163,7 @@ Node* findLowestCostLeaf(Node* node) {
     return minCostNode;
 }
 
-int* retracePath(Node* node) {
+int* retracePath(Node* node, t_rover *rover) {
     if (node == NULL) {
         printf("The node is NULL. No path to retrace.\n");
         return NULL;
@@ -178,7 +180,7 @@ int* retracePath(Node* node) {
     }
 
     // Allocate memory for the path (+1 to store the path length)
-    int* path = (int*)malloc((count + 1) * sizeof(int));
+    int* path = (int*)malloc((count+1) * sizeof(int));
     if (path == NULL) {
         printf("Memory allocation failed.\n");
         return NULL;
@@ -190,6 +192,8 @@ int* retracePath(Node* node) {
     while (current->parent != NULL) {
         totalCost += current->cost;         // Add the cost of the current node
         path[index++] = current->move;     // Store the move
+        if (current->soilType == BASE_STATION) {
+        }
         current = current->parent;         // Move to the parent node
     }
 
@@ -201,34 +205,19 @@ int* retracePath(Node* node) {
     }
 
     //print path
+    printf("move used: ");
     for (int i = 0; i < index; i++) {
         printf("%d ", path[i]);
     }
+    printf("\n");
 
-    int pathIndex = 0;
-    // Retrace the path from the given node to the root
-    while (current->parent != NULL) {
-        totalCost += current->cost;          // Add the cost of the current node
-        path[pathIndex++] = current->move;  // Store the move taken to reach this node
-        current = current->parent;          // Move to the parent node
-    }
-    for (int i = 0; i < index / 2; i++) {
-        int temp = path[i];
-        path[i] = path[index - i - 1];
-        path[index - i - 1] = temp;
-    }
-    path[pathIndex] = pathIndex;
+    path[index] = index;
 
     // Print the total cost
     printf("Total cost of the path: %d\n", totalCost);
 
-    // Print the path in reverse order (from root to the given node)
-    printf("Path (from root to node): ");
-    for (int i = pathIndex - 1; i >= 0; i--) {
-        if (path[i] != 0) { // Assuming 0 is a placeholder for no move
-            printf("%d ", path[i]);
-        }
-    }
+    rover->totalCost = totalCost;
+
     printf("\n");
     return path;
 }
@@ -286,17 +275,44 @@ void applyPath(t_map map, t_rover rover, t_move* path, int pathLength) {
     printf("Final position reached.\n");
 }
 
-void guidance(t_rover rover, int* path) {
-    int pathLength = path[-1];
+void guidance(t_rover rover, int* path, t_map map) {
+    int pathLength = path[5];
     for (int i = 0; i < pathLength; i++) {
         t_move move1 = path[i];
         t_localisation newPos = move(rover.pos, move1);
         rover.pos = newPos;
 
         printf("Rover position: (%d, %d)\n", rover.pos.pos.x, rover.pos.pos.y);
+        if (map.soils[rover.pos.pos.x][rover.pos.pos.y] == BASE_STATION) {
+            printf("Rover reached the base station\n");
+            printf("Final position reached.\n");
+            break;
+        }
 
     }
-    printf("Final position reached.\n");
+
+    if (map.soils[rover.pos.pos.x][rover.pos.pos.y] != BASE_STATION && map.soils[rover.pos.pos.x][rover.pos.pos.y] != ERG) {
+        printf("Rover did not reach the base station\n");
+        Tree tree = createEmptyTree();
+
+        t_rover rover2 = createRover(rover.pos, rover.totalCost, &tree, 5);
+        createTree(&map, &tree, rover2);
+        Node* lowestcost= findLowestCostLeaf(tree.root);
+        int* path = retracePath(lowestcost, &rover2);
+
+        guidance(rover, path, map);
+
+    }else if (map.soils[rover.pos.pos.x][rover.pos.pos.y] == ERG) {
+        printf("Rover reached a reg zone only 4 moves allowed\n");
+        Tree tree = createEmptyTree();
+
+        t_rover rover2 = createRover(rover.pos, rover.totalCost, &tree, 4);
+        createTree(&map, &tree, rover2);
+        Node* lowestcost= findLowestCostLeaf(tree.root);
+        int* path = retracePath(lowestcost, &rover2);
+
+        guidance(rover, path, map);
+    }
 }
 
 void getmouves(int tab[9]) {
