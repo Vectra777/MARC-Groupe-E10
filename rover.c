@@ -293,7 +293,11 @@ void guidance(t_rover rover, int* path, t_map map) {
             printf("Marc falls and dies.\n");
             break;
         }
-
+        if (!isValidLocalisation(newPos.pos, map.x_max, map.y_max)) {
+            printf("Out of range\n");
+            printf("Marc go away.\n");
+            break;
+        }
     }
 
     if (map.soils[rover.pos.pos.x][rover.pos.pos.y] != BASE_STATION && map.soils[rover.pos.pos.x][rover.pos.pos.y] != ERG) {
