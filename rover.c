@@ -288,6 +288,11 @@ void guidance(t_rover rover, int* path, t_map map) {
             printf("Final position reached.\n");
             break;
         }
+        if (map.soils[rover.pos.pos.x][rover.pos.pos.y] == CREVASSE) {
+            printf("The rover crosses to a crevasse\n");
+            printf("Marc falls and dies.\n");
+            break;
+        }
 
     }
 
