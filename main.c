@@ -9,7 +9,7 @@
 
  int main() {
 
-    t_map map = createMapFromFile("..\\maps\\example2.map");
+    t_map map = createMapFromFile("..\\maps\\example1.map");
     // create a test for a rover with a tree
     Tree tree = createEmptyTree();
 
